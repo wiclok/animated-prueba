@@ -1,43 +1,49 @@
-import Constants from 'expo-constants';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
-import { Button, StyleSheet, Text, View } from "react-native";
-import { useEffect } from 'react'
-import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
 
-export default function HomeScreen() {
-  
-  // Animacion de desplazamiento para el titulo cuando carga
-  const translateY = useSharedValue(-100);
+export default function App() {
+  const titleOpacity = useSharedValue(0);
+  const titleTranslateY = useSharedValue(-50);
+  const backgroundColorValue = useSharedValue(0);
+
+  const animatedTitleStyle = useAnimatedStyle(() => {
+    return {
+      opacity: titleOpacity.value,
+      transform: [{ translateY: titleTranslateY.value }],
+    };
+  });
+
+  const animatedBackgroundStyle = useAnimatedStyle(() => {
+    const backgroundColor = backgroundColorValue.value === 0 
+      ? 'rgb(65, 105, 225)'
+      : 'rgb(50, 205, 50)';
+    return { backgroundColor };
+  });
 
   useEffect(() => {
-    translateY.value = withTiming(0, { duration: 1000 });
+    titleOpacity.value = withTiming(1, { duration: 1000 });
+    titleTranslateY.value = withTiming(0, { duration: 1000 });
   }, []);
 
-  const animatedStyles = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
-  }));
-
-
-  // Animacion para cambiar el color de fondo con efecto de desvanecimiento
-
-  const progress = useSharedValue(0);
-  
-
-  const handlePress = ()=>{
-
-
-  }
-
-  const backgroundAnimated = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-  }));
+  const handleStart = () => {
+    titleOpacity.value = withTiming(0, { duration: 500 });
+    backgroundColorValue.value = withTiming(1, { duration: 1000 });
+  };
 
   return (
-    <Animated.View style={[styles.container, backgroundAnimated]}>
-      <Animated.View style={[styles.titleContainer, animatedStyles]}>
-        <Text style={styles.titleText}>Estoy Probando animaciones</Text>
-      </Animated.View>
-      <Button title="Iniciar" onPress={handlePress} />
+    <Animated.View style={[styles.container, animatedBackgroundStyle]}>
+      <Animated.Text style={[styles.title, animatedTitleStyle]}>
+        Bienvenido
+      </Animated.Text>
+      <TouchableOpacity style={styles.button} onPress={handleStart}>
+        <Text style={styles.buttonText}>Iniciar</Text>
+      </TouchableOpacity>
     </Animated.View>
   );
 }
@@ -45,20 +51,26 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: Constants.statusBarHeight,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f55151",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  titleContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  titleText: {
-    fontSize: 26,
-    fontWeight: "bold",
-    color: "white",
-    textAlign: "center",
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: 'white',
     marginBottom: 20,
-  }
+  },
+  button: {
+    position: 'absolute',
+    bottom: 50,
+    backgroundColor: 'white',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 5,
+  },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'rgb(65, 105, 225)',
+  },
 });
